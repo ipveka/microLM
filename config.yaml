@@ -1,0 +1,46 @@
+# Configuration for the MicroLM project
+
+# --- Model Architecture ---
+# These parameters define the size and structure of the language model.
+# They must be consistent across training, fine-tuning, and inference.
+model:
+  block_size: 256      # Context size for the model
+  vocab_size: 8192     # Vocabulary size
+  n_layer: 8           # Number of transformer layers
+  n_head: 8            # Number of attention heads
+  n_embd: 256          # Embedding dimension
+
+# --- File Paths ---
+# Defines where the trained models and tokenizer are saved and loaded from.
+paths:
+  base_model: 'models/base_model.pt'
+  fine_tuned_model: 'models/fine_tuned_model.pt'
+  tokenizer: 'models/tokenizer.json'
+
+# --- Training Configuration ---
+# Parameters for the initial training of the base model.
+training:
+  dataset_name: "roneneldan/TinyStories"
+  tokenizer_training_sample: 5000
+  batch_size: 16
+  learning_rate: 0.0001
+  max_steps: 100
+
+# --- Fine-Tuning Configuration ---
+# Parameters for fine-tuning the base model on a new task.
+fine_tuning:
+  dataset_name: "knkarthick/dialogsum"
+  batch_size: 8
+  learning_rate: 0.00005
+  max_steps: 50
+
+# --- Inference Configuration ---
+# Parameters for generating text with the base model.
+inference:
+  prompt: "Once upon a time, in a land filled with magical creatures,"
+  max_new_tokens: 100
+
+# --- Chat Configuration ---
+# Parameters for the interactive chat with the fine-tuned model.
+chat:
+  max_new_tokens: 80

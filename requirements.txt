@@ -1,0 +1,8 @@
+torch
+datasets
+tokenizers
+transformers
+PyYAML
+matplotlib
+wandb
+tqdm
