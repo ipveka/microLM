@@ -3,6 +3,7 @@ import torch
 from micro_lm.model import MicroLM
 from micro_lm.config import ModelConfig
 from micro_lm.tokenizer import MicroTokenizer
+from micro_lm.utils import setup_device_and_model, print_device_info
 
 
 def chat_demo():
@@ -19,8 +20,11 @@ def chat_demo():
 
     # 1. Load model and tokenizer
     # For a real chat, you would load a model fine-tuned for conversations.
+    print_device_info()
+    
     config = ModelConfig(vocab_size=1024)
     model = MicroLM(config)
+    model, device = setup_device_and_model(model, device='auto')
     tokenizer = MicroTokenizer()
 
     # Train the tokenizer on a sample of the dataset
@@ -55,6 +59,7 @@ def chat_demo():
         
         # 4. Generate response
         encoded_prompt = torch.tensor(tokenizer.encode(prompt), dtype=torch.long).unsqueeze(0)
+        encoded_prompt = encoded_prompt.to(device)  # Move to device
         
         print("Assistant: ", end="", flush=True)
         

@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 from micro_lm.tokenizer import MicroTokenizer
 from micro_lm.dataset import PackedDataset
 from micro_lm.config import ModelConfig
+from micro_lm.utils import get_device
 
 
 def data_preparation_demo():

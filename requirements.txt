@@ -1,8 +1,18 @@
-torch
-datasets
-tokenizers
-transformers
-PyYAML
-matplotlib
-wandb
-tqdm
+# PyTorch with CUDA support (GPU acceleration)
+# For GPU users (recommended):
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+# Note: Install with GPU support using:
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# For CPU-only users, the default pip install will work
+
+# Core dependencies
+datasets>=2.0.0
+tokenizers>=0.13.0
+transformers>=4.20.0
+PyYAML>=6.0
+matplotlib>=3.5.0
+wandb>=0.13.0
+tqdm>=4.64.0
+numpy>=1.21.0

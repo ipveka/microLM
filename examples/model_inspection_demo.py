@@ -1,7 +1,7 @@
 import torch
-
 from micro_lm.model import MicroLM
 from micro_lm.config import ModelConfig
+from micro_lm.utils import setup_device_and_model, print_device_info
 
 
 def model_inspection_demo():
@@ -31,8 +31,11 @@ def model_inspection_demo():
     print("\nStep 1: ModelConfig created:")
     print(config)
 
-    # 2. Instantiate the model
+    # 2. Device setup and model instantiation
+    print_device_info()
+    
     model = MicroLM(config)
+    model, device = setup_device_and_model(model, device='auto')
     print("\nStep 2: MicroLM model instantiated successfully.")
 
     # 3. Print the model architecture
@@ -49,6 +52,9 @@ def model_inspection_demo():
     batch_size = 2
     seq_length = config.block_size
     dummy_input = torch.randint(0, config.vocab_size, (batch_size, seq_length))
+    
+    # Move input to device
+    dummy_input = dummy_input.to(device)
 
     # Get model output
     logits, loss = model(dummy_input)
@@ -57,7 +63,7 @@ def model_inspection_demo():
     print(f"Output shape (logits): {logits.shape}")
     # Loss is typically not calculated during inference, but the model forward pass returns it.
     # Here we pass targets so loss is not None
-    targets = torch.randint(0, config.vocab_size, (batch_size, seq_length))
+    targets = torch.randint(0, config.vocab_size, (batch_size, seq_length)).to(device)
     logits, loss = model(dummy_input, targets)
     print(f"Loss value: {loss.item()}")
 
