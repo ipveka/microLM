@@ -3,6 +3,7 @@ import torch
 from micro_lm.model import MicroLM
 from micro_lm.config import ModelConfig
 from micro_lm.tokenizer import MicroTokenizer
+from micro_lm.utils import setup_device_and_model, print_device_info
 
 
 def text_generation_demo():
@@ -20,8 +21,11 @@ def text_generation_demo():
 
     # For demonstration, we'll initialize a new model and tokenizer.
     # In a real use case, you would load your trained model and tokenizer.
+    print_device_info()
+    
     config = ModelConfig(vocab_size=512) # Use a small vocab for this example
     model = MicroLM(config)
+    model, device = setup_device_and_model(model, device='auto')
     tokenizer = MicroTokenizer()
 
     # Train the tokenizer on a sample of the dataset
@@ -49,6 +53,7 @@ def text_generation_demo():
     # 3. Tokenize the prompt
     # The model expects a batch of token indices, so we add a batch dimension.
     encoded_prompt = torch.tensor(tokenizer.encode(prompt), dtype=torch.long).unsqueeze(0)
+    encoded_prompt = encoded_prompt.to(device)  # Move to device
     print("\nStep 3: Prompt tokenized successfully.")
     print(f"Tokenized input shape: {encoded_prompt.shape}")
 

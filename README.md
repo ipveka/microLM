@@ -1,100 +1,335 @@
-# microLM: A Compact Transformer Language Model Framework
+# 🤖 microLM: A Compact Transformer Language Model Framework
 
-A lightweight and easy-to-understand framework for training and experimenting with Transformer-based language models. Built with PyTorch.
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Installation
+A **lightweight and easy-to-understand** framework for training and experimenting with Transformer-based language models.
 
-To get started, clone the repository and install the required dependencies:
+## ✨ Features
+
+- 🏗️ **Clean Architecture**: Modular design with clear separation of concerns
+- ⚡ **Modern PyTorch**: Supports Flash Attention for PyTorch >= 2.0
+- 📚 **Educational**: Comprehensive examples and documentation for learning
+- 🔧 **Configurable**: Easy model configuration via dataclasses
+- 📦 **Efficient Training**: Packed dataset implementation for optimal memory usage
+- 🎯 **GPT-Style**: Implements causal self-attention and standard transformer blocks
+- 🚀 **Ready-to-Use**: Pre-configured for TinyStories dataset
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.8+ (Python 3.11+ recommended)
+- PyTorch 2.0+ (CPU or GPU version)
+
+### Installation
+
+#### Step 1: Clone the Repository
 
 ```bash
 git clone <repository-url>
 cd microLM
-pip install -r requirements.txt
 ```
 
-## Examples
+#### Step 2: Install the Package
 
-The `examples/` directory contains a set of scripts to demonstrate the core functionalities of `microLM`. 
+**Option A: Development Installation with GPU Support (Recommended)**
 
-### `data_preparation_demo.py`
+For the best performance with GPU acceleration:
 
-Demonstrates the full data pipeline, including:
-- Initializing the tokenizer.
-- Loading a dataset from Hugging Face (`roneneldan/TinyStories`).
-- Wrapping the data in the `PackedDataset` for efficient, autoregressive training.
-- Using a `DataLoader` to create and inspect a batch.
+```bash
+# 1. Install the package in editable mode
+pip install -e .
 
-**To run:**
+# 2. Install PyTorch with GPU support (CUDA)
+# For CUDA 12.1 (most common):
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+# For CUDA 11.8 (if you have older drivers):
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+**Option B: CPU-Only Installation**
+
+If you don't have a GPU or prefer CPU-only:
+
+```bash
+# Install with CPU-only PyTorch
+pip install -e .
+# PyTorch CPU version will be installed automatically
+```
+
+**Option C: Regular Installation**
+
+```bash
+pip install -r requirements.txt
+# Then follow GPU installation steps above if desired
+```
+
+#### Step 3: Verify Installation
+
+**Basic Installation Check:**
+```bash
+# Test the installation
+python -c "import micro_lm; print('microLM installed successfully!')"
+```
+
+**GPU Support Verification:**
+```bash
+# Check if GPU is available and working
+python -c "import torch; print('PyTorch version:', torch.__version__); print('CUDA available:', torch.cuda.is_available()); print('GPU device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'No GPU')"
+```
+
+**Quick GPU Detection:**
+```bash
+# Check your GPU (Windows)
+nvidia-smi
+
+# Check your GPU (Linux)
+lspci | grep -i nvidia
+```
+
+**Expected Output for GPU Users:**
+```
+PyTorch version: 2.5.1+cu124
+CUDA available: True
+GPU device: NVIDIA GeForce RTX 4060 Laptop GPU
+```
+
+### 🔧 Setting Up Python Alias (Windows)
+
+If you have multiple Python versions or long paths, create an alias for easier usage:
+
+**PowerShell (Temporary - current session only):**
+```powershell
+# Set alias for current session
+Set-Alias -Name python -Value "C:\Users\YourUsername\AppData\Local\Programs\Python\Python311\python.exe"
+
+# Now you can use:
+python examples/model_inspection_demo.py
+```
+
+**PowerShell Profile (Permanent):**
+```powershell
+# Open/create your PowerShell profile
+notepad $PROFILE
+
+# Add this line to the file:
+Set-Alias -Name python -Value "C:\Users\YourUsername\AppData\Local\Programs\Python\Python311\python.exe"
+
+# Reload profile
+. $PROFILE
+```
+
+**Alternative: Use `py` launcher (if available):**
+```powershell
+# Use Python launcher (automatically finds correct version)
+py examples/model_inspection_demo.py
+```
+
+### 🔍 Troubleshooting
+
+**Problem: `ModuleNotFoundError: No module named 'micro_lm'`**
+
+*Solution:* The package isn't installed. Run the development installation:
+```bash
+pip install -e .
+```
+
+**Problem: Multiple Python versions causing conflicts**
+
+*Solution:* Use the full path to your desired Python version:
+```bash
+# Find your Python installation
+where python  # Windows
+which python  # Linux/Mac
+
+# Use specific version
+C:\Path\To\Python311\python.exe -m pip install -e .
+```
+
+**Problem: `'python' is not recognized as an internal or external command`**
+
+*Solution:* Either:
+1. Add Python to your PATH environment variable, or
+2. Use the full path to python.exe, or
+3. Set up an alias as shown above
+
+**Problem: Import errors with dependencies**
+
+*Solution:* Install missing dependencies:
+```bash
+pip install torch datasets transformers tokenizers matplotlib wandb tqdm
+```
+
+### Basic Usage
+
+```python
+from micro_lm.model import MicroLM
+from micro_lm.config import ModelConfig
+
+# Create a small model
+config = ModelConfig(
+    block_size=256,
+    vocab_size=1024,
+    n_layer=6,
+    n_head=6,
+    n_embd=384
+)
+
+model = MicroLM(config)
+print(f"Model has {sum(p.numel() for p in model.parameters())} parameters")
+```
+
+## 📖 Examples
+
+The `examples/` directory contains comprehensive scripts demonstrating all core functionalities: 
+
+### 📊 Data Preparation (`data_preparation_demo.py`)
+
+Learn the complete data pipeline:
+- ✅ Initialize the tokenizer
+- ✅ Load datasets from Hugging Face (TinyStories)
+- ✅ Create packed datasets for efficient training
+- ✅ Inspect batches and data flow
+
 ```bash
 python examples/data_preparation_demo.py
 ```
 
-### `model_inspection_demo.py`
+### 🔍 Model Inspection (`model_inspection_demo.py`)
 
-Shows how to instantiate and inspect the `MicroLM` model:
-- Creating a `ModelConfig` to define the model's architecture.
-- Printing the model summary and architecture.
-- Calculating the total number of parameters.
+Explore model architecture and parameters:
+- ✅ Configure model architecture
+- ✅ Print detailed model summary
+- ✅ Calculate parameter counts
+- ✅ Understand model structure
 
-**To run:**
 ```bash
 python examples/model_inspection_demo.py
 ```
 
-### `training_demo.py`
+### 🏋️ Training Demo (`training_demo.py`)
 
-Provides a minimal working example of a training loop:
-- Setting up the model, tokenizer, and dataset.
-- Initializing an AdamW optimizer.
-- Running a few training steps, including forward pass, loss calculation, and backpropagation.
+Minimal training loop implementation:
+- ✅ Model, tokenizer, and dataset setup
+- ✅ AdamW optimizer configuration
+- ✅ Forward pass and loss calculation
+- ✅ Backpropagation and parameter updates
 
-**To run:**
 ```bash
 python examples/training_demo.py
 ```
 
-### `text_generation_demo.py`
+### 💬 Chat Demo (`chat_demo.py`)
 
-Demonstrates how to generate text with a model:
-- Loading a model and tokenizer.
-- Encoding a text prompt.
-- Using the model's `generate` method to produce new text.
-- Decoding the output tokens back into a human-readable string.
+Interactive chat interface:
+- ✅ Load pre-trained models
+- ✅ Interactive conversation loop
+- ✅ Text generation with sampling
 
-**To run:**
-```bash
-python examples/text_generation_demo.py
-```
-
-### `chat_demo.py`
-
-An example of an interactive chat session with the model:
-- Loading a model and tokenizer.
-- Entering a loop that accepts user input.
-- Generating and printing the model's response in real-time.
-
-**To run:**
 ```bash
 python examples/chat_demo.py
 ```
 
+### 📝 Text Generation (`text_generation_demo.py`)
 
-`microLM` is a lightweight, modular, and well-tested framework for building, training, and running GPT-style language models from scratch. It is designed to be easy to understand, modify, and extend, making it an ideal tool for educational purposes, research, and hobbyist projects. The entire framework is optimized to run efficiently on standard CPUs and low-end GPUs.
+Text generation capabilities:
+- ✅ Load trained models
+- ✅ Generate text with various sampling strategies
+- ✅ Control generation parameters
 
-## Features
+```bash
+python examples/text_generation_demo.py
+```
 
-- **Modular Architecture**: Code is cleanly separated into modules for tokenization, data handling, model architecture, training, and inference.
-- **Custom & Pretrained Tokenizers**: Supports loading pretrained HuggingFace tokenizers (like GPT-2) or training your own custom BPE tokenizer on your data.
-- **Efficient Data Handling**: Uses streaming datasets to handle large text corpora without requiring massive amounts of RAM.
-- **Comprehensive Unit Tests**: A full suite of unit tests ensures the reliability and correctness of all core components.
-- **Clear Configuration**: A simple, dataclass-based configuration system makes it easy to define and manage model and training parameters.
-- **Example Scripts**: Includes ready-to-run examples for training a model and generating text.
+## 🎯 Training
+
+### Quick Training
+
+Train a model from scratch on the TinyStories dataset:
+
+```bash
+python src/training.py
+```
+
+### Custom Training
+
+```python
+from micro_lm.config import get_config
+from micro_lm.train import train_model
+
+# Use pre-configured settings
+config = get_config('tinystories')  # or 'base'
+
+# Customize as needed
+config.batch_size = 32
+config.learning_rate = 1e-4
+config.max_iters = 10000
+
+# Start training
+train_model(config)
+```
+
+## 🏗️ Architecture
+
+The model implements a standard GPT-style transformer with:
+
+- **Causal Self-Attention**: Multi-head attention with causal masking
+- **Feed-Forward Networks**: MLP blocks with GELU activation
+- **Layer Normalization**: Optional bias support
+- **Positional Embeddings**: Learned position encodings
+- **Weight Tying**: Shared embedding and output layer weights
+
+## 📁 Project Structure
+
+```
+microLM/
+├── micro_lm/           # Core framework
+│   ├── model.py        # Transformer implementation
+│   ├── config.py       # Configuration classes
+│   ├── dataset.py      # Data loading utilities
+│   ├── tokenizer.py    # Tokenization
+│   ├── train.py        # Training utilities
+│   └── inference.py    # Inference utilities
+├── examples/           # Educational demos
+├── src/               # Training scripts
+├── tests/             # Test suite
+└── requirements.txt   # Dependencies
+```
+
+## ⚙️ Configuration
+
+Easily configure your models:
+
+```python
+from micro_lm.config import ModelConfig, TrainConfig
+
+# Model architecture
+model_config = ModelConfig(
+    block_size=512,      # Context length
+    vocab_size=50257,    # Vocabulary size
+    n_layer=12,          # Number of layers
+    n_head=12,           # Attention heads
+    n_embd=768,          # Embedding dimension
+    dropout=0.1          # Dropout rate
+)
+
+# Training configuration
+train_config = TrainConfig(
+    model_config=model_config,
+    batch_size=64,
+    learning_rate=1e-4,
+    max_iters=50000
+)
+```
 
 ## Project Structure
 
 ```
 . 
-├── examples/           # Example scripts (e.g., train_tinystories.py)
+├── examples/           # Example scripts
 ├── micro_lm/           # Core library source code
 │   ├── __init__.py
 │   ├── config.py       # Configuration objects (ModelConfig, TrainConfig)

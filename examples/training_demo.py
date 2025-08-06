@@ -5,6 +5,7 @@ from micro_lm.model import MicroLM
 from micro_lm.config import ModelConfig
 from micro_lm.tokenizer import MicroTokenizer
 from micro_lm.dataset import PackedDataset
+from micro_lm.utils import setup_device_and_model, print_device_info
 
 
 def training_demo():
@@ -28,8 +29,12 @@ def training_demo():
         n_embd=128
     )
     
+    # Device setup
+    print_device_info()
+    
     # Model and Tokenizer
     model = MicroLM(config)
+    model, device = setup_device_and_model(model, device='auto')
     tokenizer = MicroTokenizer()
 
     # Train the tokenizer on a sample of the dataset
@@ -65,6 +70,9 @@ def training_demo():
         if i >= max_steps:
             break
 
+        # Move data to device
+        x, y = x.to(device), y.to(device)
+        
         # Forward pass
         logits, loss = model(x, y)
 
